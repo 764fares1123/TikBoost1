@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikBoost - خدمات تيك توك</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        header {
+            background: linear-gradient(135deg, #69f0ae, #00b0ff);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        /* أنماط زر عروض اليوم */
+        .offers-toggle-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+        }
+        .offers-toggle-btn:hover {
+            background: #ff6b81;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        
+        /* أنماط قسم عروض اليوم */
+        .daily-offers {
+            display: none;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            color: white;
+            padding: 1.5rem;
+            margin: 1rem auto;
+            max-width: 800px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            text-align: center;
+            position: relative;
+        }
+        .daily-offers.show {
+            display: block;
+            animation: slideDown 0.5s ease-out;
+        }
+        @keyframes slideDown {
+            from { 
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .close-offers {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            background: rgba(0,0,0,0.2);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .offers-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 1.5rem;
+        }
+        .offer-card {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            border-radius: 12px;
+            padding: 1.5rem;
+            width: 240px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .offer-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.2);
+        }
+        .offer-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #ff4757, #ff8e53);
+        }
+        .offer-card h3 {
+            color: #ff4757;
+            margin-top: 0;
+            font-size: 1.3rem;
+        }
+        .offer-price {
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: #2f3542;
+            margin: 10px 0;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: #747d8c;
+            font-size: 1rem;
+        }
+        .discount-badge {
+            background: #ff4757;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-left: 8px;
+            display: inline-block;
+        }
+        .offer-time {
+            font-size: 0.85rem;
+            color: #f1f2f6;
+            margin-top: 15px;
+            display: block;
+            background: rgba(0,0,0,0.1);
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .countdown {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 15px 0;
+            display: inline-block;
+            background: rgba(0,0,0,0.15);
+            padding: 8px 15px;
+            border-radius: 30px;
+        }
+        
+        /* أنماط أصلية معدلة */
+        .category {
+            background: white;
+            margin: 1.5rem auto;
+            max-width: 900px;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .services {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            padding: 2rem;
+        }
+        .service-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.8rem;
+            width: 320px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #00b0ff, #69f0ae);
+        }
+        .service-card h3 {
+            color: #00b0ff;
+            margin-top: 0;
+            font-size: 1.4rem;
+        }
+        .price-unit {
+            color: #666;
+            font-size: 1rem;
+            margin: 10px 0;
+        }
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            justify-content: center;
+        }
+        .quantity-selector button {
+            background: #f0f0f0;
+            color: #333;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .quantity-selector button:hover {
+            background: #e0e0e0;
+        }
+        .quantity-selector input {
+            width: 80px;
+            text-align: center;
+            margin: 0 12px;
+            padding: 10px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        .total-price {
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: #ff5722;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+        button.order-btn {
+            background: linear-gradient(135deg, #00b0ff, #69f0ae);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 100%;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        button.order-btn:hover {
+            background: linear-gradient(135deg, #0081cb, #4caf50);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        #orderForm {
+            max-width: 500px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            display: none;
+            position: relative;
+        }
+        #orderForm::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #ff5722, #ff9800);
+            border-radius: 12px 12px 0 0;
+        }
+        .order-details {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #00b0ff;
+        }
+        .order-details p {
+            margin: 12px 0;
+            font-size: 1.1rem;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .form-group input:focus {
+            border-color: #00b0ff;
+            box-shadow: 0 0 0 3px rgba(0,176,255,0.1);
+            outline: none;
+        }
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background: #333;
+            color: white;
+            margin-top: 2rem;
+        }
+        .whatsapp-btn {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .whatsapp-btn:hover {
+            background: linear-gradient(135deg, #128C7E, #075E54);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .whatsapp-note {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* تأثيرات إضافية */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <button class="offers-toggle-btn pulse" onclick="toggleOffers()">
+            <i class="fas fa-bolt"></i> عروض اليوم
+        </button>
+        <h1>TikBoost</h1>
+        <p>زود متابعينك ومشاهداتك بسرعة وأمان!</p>
+    </header>
+
+    <!-- قسم عروض اليوم -->
+    <div class="daily-offers" id="dailyOffers">
+        <button class="close-offers" onclick="toggleOffers()">
+            <i class="fas fa-times"></i>
+        </button>
+        <h2><i class="fas fa-bolt"></i> عروض اليوم الخاص</h2>
+        <p>خصومات حصرية لفترة محدودة فقط!</p>
+        <div class="countdown">
+            <i class="fas fa-clock"></i> الوقت المتبقي: <span id="hours">12</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
+        </div>
+        
+        <div class="offers-container">
+            <div class="offer-card floating" style="animation-delay: 0.1s;">
+                <h3><i class="fas fa-crown"></i> الباقة الذهبية</h3>
+                <p>5000 متابع + 5000 لايك</p>
+                <div class="offer-price">
+                    <span class="discount-badge">50% خصم</span>
+                    200 جنيه
+                </div>
+                <span class="original-price">بدلاً من 400 جنيه</span>
+                <span class="offer-time"><i class="fas fa-stopwatch"></i> ينتهي خلال 12 ساعة</span>
+                <button class="order-btn" onclick="showOfferForm('الباقة الذهبية', '5000 متابع + 5000 لايك', '200')">
+                    <i class="fas fa-shopping-cart"></i> احصل عليها الآن
+                </button>
+            </div>
+            
+            <div class="offer-card floating" style="animation-delay: 0.3s;">
+                <h3><i class="fas fa-eye"></i> عرض المشاهدات</h3>
+                <p>10000 مشاهدة + 2000 لايك</p>
+                <div class="offer-price">
+                    <span class="discount-badge">40% خصم</span>
+                    60 جنيه
+                </div>
+                <span class="original-price">بدلاً من 100 جنيه</span>
+                <span class="offer-time"><i class="fas fa-stopwatch"></i> ينتهي خلال 24 ساعة</span>
+                <button class="order-btn" onclick="showOfferForm('عرض المشاهدات', '10000 مشاهدة + 2000 لايك', '60')">
+                    <i class="fas fa-shopping-cart"></i> احصل عليها الآن
+                </button>
+            </div>
+            
+            <div class="offer-card floating" style="animation-delay: 0.5s;">
+                <h3><i class="fas fa-video"></i> باقة البث المباشر</h3>
+                <p>5000 مشاهدة بث + 1000 متابع</p>
+                <div class="offer-price">
+                    <span class="discount-badge">35% خصم</span>
+                    120 جنيه
+                </div>
+                <span class="original-price">بدلاً من 185 جنيه</span>
+                <span class="offer-time"><i class="fas fa-stopwatch"></i> ينتهي خلال 18 ساعة</span>
+                <button class="order-btn" onclick="showOfferForm('باقة البث المباشر', '5000 مشاهدة بث + 1000 متابع', '120')">
+                    <i class="fas fa-shopping-cart"></i> احصل عليها الآن
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="category">
+        <h2><i class="fas fa-list"></i> اختر الخدمة المطلوبة</h2>
+        
+        <div class="services">
+            <div class="service-card">
+                <h3><i class="fas fa-users"></i> متابعين تيك توك</h3>
+                <p class="price-unit">1000 متابع = 50 جنيه</p>
+                
+                <div class="quantity-selector">
+                    <button onclick="changeQuantity(this, -1000)">-</button>
+                    <input type="number" value="1000" min="1000" step="1000" class="quantity" data-price="50">
+                    <button onclick="changeQuantity(this, 1000)">+</button>
+                </div>
+                
+                <div class="total-price">المجموع: 50 جنيه</div>
+                <button class="order-btn" onclick="showOrderForm('متابعين تيك توك', this)">
+                    <i class="fas fa-paper-plane"></i> اطلب الآن
+                </button>
+            </div>
+
+            <div class="service-card">
+                <h3><i class="fas fa-eye"></i> مشاهدات تيك توك</h3>
+                <p class="price-unit">1000 مشاهدة = 5 جنيه</p>
+                
+                <div class="quantity-selector">
+                    <button onclick="changeQuantity(this, -1000)">-</button>
+                    <input type="number" value="1000" min="1000" step="1000" class="quantity" data-price="5">
+                    <button onclick="changeQuantity(this, 1000)">+</button>
+                </div>
+                
+                <div class="total-price">المجموع: 5 جنيه</div>
+                <button class="order-btn" onclick="showOrderForm('مشاهدات تيك توك', this)">
+                    <i class="fas fa-paper-plane"></i> اطلب الآن
+                </button>
+            </div>
+
+            <div class="service-card">
+                <h3><i class="fas fa-heart"></i> لايكات تيك توك</h3>
+                <p class="price-unit">1000 لايك = 10 جنيه</p>
+                
+                <div class="quantity-selector">
+                    <button onclick="changeQuantity(this, -1000)">-</button>
+                    <input type="number" value="1000" min="1000" step="1000" class="quantity" data-price="10">
+                    <button onclick="changeQuantity(this, 1000)">+</button>
+                </div>
+                
+                <div class="total-price">المجموع: 10 جنيه</div>
+                <button class="order-btn" onclick="showOrderForm('لايكات تيك توك', this)">
+                    <i class="fas fa-paper-plane"></i> اطلب الآن
+                </button>
+            </div>
+
+            <div class="service-card">
+                <h3><i class="fas fa-broadcast-tower"></i> بث مباشر تيك توك</h3>
+                <p class="price-unit">1000 مشاهدة بث = 15 جنيه</p>
+                
+                <div class="quantity-selector">
+                    <button onclick="changeQuantity(this, -1000)">-</button>
+                    <input type="number" value="1000" min="1000" step="1000" class="quantity" data-price="15">
+                    <button onclick="changeQuantity(this, 1000)">+</button>
+                </div>
+                
+                <div class="total-price">المجموع: 15 جنيه</div>
+                <button class="order-btn" onclick="showOrderForm('بث مباشر تيك توك', this)">
+                    <i class="fas fa-paper-plane"></i> اطلب الآن
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="orderForm">
+        <button class="close-offers" onclick="closeOrderForm()">
+            <i class="fas fa-times"></i>
+        </button>
+        <h2><i class="fas fa-file-alt"></i> تفاصيل طلبك</h2>
+        <div class="order-details">
+            <p><strong><i class="fas fa-tag"></i> الخدمة:</strong> <span id="serviceType"></span></p>
+            <p><strong><i class="fas fa-hashtag"></i> الكمية:</strong> <span id="serviceQuantity"></span></p>
+            <p><strong><i class="fas fa-money-bill-wave"></i> السعر الإجمالي:</strong> <span id="serviceTotal"></span></p>
+        </div>
+        
+        <div class="form-group">
+            <label for="phone"><i class="fas fa-phone"></i> رقم الهاتف (واتساب):</label>
+            <input type="tel" id="phone" placeholder="مثال: 01552127091" required>
+        </div>
+        <div class="form-group">
+            <label for="tiktokLink"><i class="fas fa-link"></i> رابط الحساب/الفيديو:</label>
+            <input type="url" id="tiktokLink" placeholder="https://www.tiktok.com/@username" required>
+        </div>
+        
+        <a id="whatsappLink" class="whatsapp-btn" target="_blank">
+            <i class="fab fa-whatsapp"></i> إرسال الطلب عبر واتساب
+        </a>
+        <p class="whatsapp-note">سيتم فتح محادثة واتساب معنا لإتمام الطلب</p>
+        
+        <button class="order-btn" onclick="closeOrderForm()">
+            <i class="fas fa-arrow-right"></i> رجوع
+        </button>
+    </div>
+
+    <footer>
+        <p><i class="fas fa-copyright"></i> 2024 TikBoost - جميع الحقوق محفوظة</p>
+        <p><i class="fas fa-phone"></i> للتواصل: <a href="https://wa.me/201552127091" style="color: #69f0ae;">01552127091</a></p>
+    </footer>
+
+    <script>
+        // تغيير الكمية
+        function changeQuantity(btn, change) {
+            const container = btn.parentElement;
+            const input = container.querySelector('.quantity');
+            let newValue = parseInt(input.value) + change;
+            
+            if(newValue < parseInt(input.min)) newValue = parseInt(input.min);
+            
+            input.value = newValue;
+            updatePrice(container);
+        }
+
+        // تحديث السعر
+        function updatePrice(container) {
+            const input = container.querySelector('.quantity');
+            const pricePerUnit = parseFloat(input.dataset.price);
+            const quantity = parseInt(input.value) / 1000;
+            const total = (pricePerUnit * quantity).toFixed(0);
+            
+            const totalElement = container.parentElement.querySelector('.total-price');
+            totalElement.textContent = `المجموع: ${total} جنيه`;
+        }
+
+        // عرض/إخفاء قسم العروض
+        function toggleOffers() {
+            const offersSection = document.getElementById('dailyOffers');
+            offersSection.classList.toggle('show');
+            
+            // إيقاف المؤقت عند الإغلاق
+            if(!offersSection.classList.contains('show')) {
+                clearInterval(countdownTimer);
+            } else {
+                startCountdown();
+            }
+        }
+
+        // عرض نموذج الطلب للخدمات العادية
+        function showOrderForm(service, btn) {
+            document.getElementById('dailyOffers').classList.remove('show');
+            
+            const card = btn.parentElement;
+            const quantity = card.querySelector('.quantity').value;
+            const total = card.querySelector('.total-price').textContent;
+            
+            document.getElementById('orderForm').style.display = 'block';
+            document.getElementById('serviceType').textContent = service;
+            document.getElementById('serviceQuantity').textContent = quantity + ' ' + 
+                (service.includes('متابعين') ? 'متابع' : 
+                 service.includes('مشاهدات') ? 'مشاهدة' : 
+                 service.includes('لايكات') ? 'لايك' : 'مشاهدة بث مباشر');
+            document.getElementById('serviceTotal').textContent = total;
+            
+            updateWhatsappLink();
+            
+            window.scrollTo({
+                top: document.getElementById('orderForm').offsetTop,
+                behavior: 'smooth'
+            });
+        }
+
+        // عرض نموذج الطلب للعروض الخاصة
+        function showOfferForm(offerName, offerDetails, offerPrice) {
+            document.getElementById('dailyOffers').classList.remove('show');
+            
+            document.getElementById('orderForm').style.display = 'block';
+            document.getElementById('serviceType').textContent = offerName;
+            document.getElementById('serviceQuantity').textContent = offerDetails;
+            document.getElementById('serviceTotal').textContent = offerPrice + ' جنيه';
+            
+            updateWhatsappLink();
+            
+            window.scrollTo({
+                top: document.getElementById('orderForm').offsetTop,
+                behavior: 'smooth'
+            });
+        }
+
+        // إغلاق نموذج الطلب
+        function closeOrderForm() {
+            document.getElementById('orderForm').style.display = 'none';
+        }
+
+        // تحديث رابط الواتساب
+        document.getElementById('phone').addEventListener('input', updateWhatsappLink);
+        document.getElementById('tiktokLink').addEventListener('input', updateWhatsappLink);
+
+        function updateWhatsappLink() {
+            const phone = document.getElementById('phone').value;
+            const link = document.getElementById('tiktokLink').value;
+            const service = document.getElementById('serviceType').textContent;
+            const quantity = document.getElementById('serviceQuantity').textContent;
+            const total = document.getElementById('serviceTotal').textContent;
+            
+            const message = `طلب خدمة تيك توك:
+الخدمة: ${service}
+الكمية: ${quantity}
+${total}
+رابط الحساب: ${link || 'لم يتم إدخاله'}
+رقم الهاتف: ${phone || 'لم يتم إدخاله'}`;
+            
+            document.getElementById('whatsappLink').href = `https://wa.me/201552127091?text=${encodeURIComponent(message)}`;
+        }
+
+        // تحديث السعر عند التغيير اليدوي
+        document.querySelectorAll('.quantity').forEach(input => {
+            input.addEventListener('change', function() {
+                if(this.value < this.min) this.value = this.min;
+                updatePrice(this.parentElement);
+            });
+        });
+
+        // عداد تنازلي للعروض
+        let countdownTimer;
+        function startCountdown() {
+            let hours = 12;
+            let minutes = 0;
+            let seconds = 0;
+            
+            clearInterval(countdownTimer);
+            
+            countdownTimer = setInterval(() => {
+                if (seconds === 0) {
+                    if (minutes === 0) {
+                        if (hours === 0) {
+                            clearInterval(countdownTimer);
+                            document.querySelector('.countdown').innerHTML = '<i class="fas fa-clock"></i> انتهى وقت العرض!';
+                            return;
+                        }
+                        hours--;
+                        minutes = 59;
+                    } else {
+                        minutes--;
+                    }
+                    seconds = 59;
+                } else {
+                    seconds--;
+                }
+                
+                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            }, 1000);
+        }
+        
+        // بدء المؤقت عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            // يمكنك هنا جلب العروض الحقيقية من قاعدة بيانات إذا أردت
+            startCountdown();
+        });
+    </script>
+</body>
+</html>
